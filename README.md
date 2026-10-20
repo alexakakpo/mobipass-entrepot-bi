@@ -43,7 +43,7 @@ flowchart LR
 
 ## L'entrepôt de données (travail d'équipe)
 
-Le modèle conceptuel de l'entrepôt, réalisé avec Looping, regroupe 29 tables Oracle : sociétés et géographie France / Allemagne, employés et métiers ROME, produits, tarifs par pays, réductions, locations et achats.
+Le modèle conceptuel de l'entrepôt, réalisé avec Looping, regroupe 29 tables Oracle : sociétés et géographie France / Allemagne, employés et métiers ROME, produits, tarifs par pays, réductions, locations et achats. Les tables de référence (zones géographiques, catégories juridiques) sont construites à partir des fichiers publics de l'INSEE et de Destatis, décrits dans [referentiels/](referentiels/README.md).
 
 ![MCD de l'entrepôt](docs/img/ed_mcd_looping.png)
 
@@ -156,6 +156,7 @@ generation/           générateur Python du jeu de données (graine fixe, repro
 modelisation/         schéma conceptuel du magasin (JSON) et treillis des agrégats (draw.io)
 powerbi/              rapport Power BI Ventes (.pbix), exports PDF des rapports Ventes et Locations
 docs/                 besoins, choix de conception, guide d'exécution, images
+referentiels/         référentiels publics INSEE et Destatis, et leur mise au format de l'entrepôt
 ```
 
 ## Stack
