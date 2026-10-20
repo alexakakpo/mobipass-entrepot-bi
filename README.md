@@ -41,6 +41,12 @@ flowchart LR
     PBI --> B[Responsable Berlin<br/>Allemagne]
 ```
 
+## L'entrepôt de données (travail d'équipe)
+
+Le modèle conceptuel de l'entrepôt, réalisé avec Looping, regroupe 29 tables Oracle : sociétés et géographie France / Allemagne, employés et métiers ROME, produits, tarifs par pays, réductions, locations et achats.
+
+![MCD de l'entrepôt](docs/img/ed_mcd_looping.png)
+
 ## Le modèle du magasin Ventes
 
 ```mermaid
@@ -79,6 +85,19 @@ erDiagram
 
 Le schéma conceptuel complet (paramètres, hiérarchies, cardinalités) est dans [modelisation/MD2_Ventes_schema_conceptuel.json](modelisation/MD2_Ventes_schema_conceptuel.json). Il s'ouvre dans l'éditeur de modèles OLAP [appmodelisationolap](https://crussiere.github.io/appmodelisationolap/) (bouton « Importer (JSON) »).
 
+### Première version du schéma conceptuel, et ce qui a changé
+
+Voici le premier schéma que j'ai modélisé dans l'éditeur OLAP, avant de le confronter au client et à l'équipe :
+
+![Première version du schéma conceptuel du magasin Ventes](docs/img/md2_ventes_schema_v1.png)
+
+Entre cette version et la version finale (le schéma en étoile ci-dessus et le fichier JSON) :
+- **La société est passée dans la dimension Employé.** Un achat est fait par un employé, rattaché à un service puis à une société : garder une dimension Société à part créait un double chemin vers la même information. Le groupe a choisi la même structure pour les deux magasins.
+- **Le trimestre a été retiré.** Le client demande des analyses par jour, mois et année. Le trimestre ne servait qu'à un rapport que nous avions proposé, qui est passé au mois.
+- **L'employé est historisé.** La racine de la dimension devient la version de l'employé (une par affectation), pour rattacher chaque achat au service et à la société valables à sa date.
+- **Les montants TTC ont été ajoutés.** En entretien, le client a validé le HT comme base commune, mais il veut pouvoir afficher le TTC.
+- **Les noms ont été alignés** sur ceux du magasin Locations (CodeProduit, CodeSociete, H_France…), pour que les deux magasins se lisent de la même façon.
+
 ### Treillis partiel des agrégats
 
 Seuls les agrégats utiles aux rapports mensuels sont matérialisés. Chaque agrégat garde le pays, pour que la sécurité par pays s'applique aussi.
@@ -106,6 +125,18 @@ Le fichier est dans [powerbi/MD2_Ventes.pbix](powerbi/MD2_Ventes.pbix), et l'exp
 
 **HT ou TTC au choix.** Les tarifs français sont en TTC et les allemands en HT. Tous les montants sont ramenés en **HT** pour pouvoir comparer les pays. Un bouton **HT / TTC** permet au décideur d'afficher le TTC, comme le client l'a demandé en entretien. Le bénéfice reste toujours en HT.
 
+## Le magasin Locations (réalisé par mes coéquipiers)
+
+Le second magasin du projet sert le responsable des locations : durées, montants au prix public et montants réellement payés, par semaine, mois et année, selon les exemplaires et les employés.
+
+![Schéma multidimensionnel du magasin Locations](docs/img/md1_locations_schema.png)
+
+| Analyse des locations | Comparaison annuelle |
+|---|---|
+| ![Rapport Locations, page 1](docs/img/md1_rapport-1.png) | ![Rapport Locations, page 2](docs/img/md1_rapport-2.png) |
+
+Le rapport complet est dans [powerbi/MD1_Locations_rapports.pdf](powerbi/MD1_Locations_rapports.pdf).
+
 ## Points techniques que je retiens
 
 - **Historiser l'employé (dimension à évolution lente de type 2).** Un salarié qui change de service garde ses anciens achats rattachés à son ancien service : une version par affectation, et un achat est relié à la version valable à sa date.
@@ -123,8 +154,8 @@ Voir [docs/03_guide_execution.md](docs/03_guide_execution.md) : ordre des script
 sql/                  01 création ED, 02 contraintes, 03 données, 04 magasin Ventes
 generation/           générateur Python du jeu de données (graine fixe, reproductible)
 modelisation/         schéma conceptuel du magasin (JSON) et treillis des agrégats (draw.io)
-powerbi/              rapport Power BI (.pbix) et export PDF
-docs/                 besoins, choix de conception, guide d'exécution
+powerbi/              rapport Power BI Ventes (.pbix), exports PDF des rapports Ventes et Locations
+docs/                 besoins, choix de conception, guide d'exécution, images
 ```
 
 ## Stack
